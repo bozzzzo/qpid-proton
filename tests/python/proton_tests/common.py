@@ -86,7 +86,11 @@ def pump(transport1, transport2, buffer_size=1024):
 def isSSLPresent():
     return SSL.present()
 
+class DefaultConfig:
+    defines = {}
+    
 class Test(TestCase):
+  config = DefaultConfig()
 
   def __init__(self, name):
     super(Test, self).__init__(name)
@@ -113,6 +117,13 @@ class Test(TestCase):
   @property
   def verbose(self):
     return int(self.default("verbose", 0))
+
+  def setUp(self):
+      getattr(self, "setup", tuple)()
+
+  def tearDown(self):
+      getattr(self, "teardown", tuple)()
+
 
 
 class Skipped(Exception):
