@@ -60,6 +60,8 @@ def pn_reactor_mark(r):
     return r.mark()
 def pn_reactor_wakeup(r):
     return r.wakeup()
+def pn_reactor_io(r):
+    raise "TBD"
 
 def pn_handler_add(h, c):
     h.add(c)
