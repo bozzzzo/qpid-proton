@@ -647,6 +647,9 @@ def pn_link_queued(link):
 def pn_link_get_drain(link):
   return link.impl.getDrain();
 
+def pn_link_set_drain(link, drain):
+  return link.impl.setDrain(drain);
+
 def pn_link_unsettled(link):
   return link.impl.getUnsettled()
 
