@@ -644,6 +644,9 @@ def pn_link_credit(link):
 def pn_link_queued(link):
   return link.impl.getQueued()
 
+def pn_link_get_drain(link):
+  return link.impl.getDrain();
+
 def pn_link_unsettled(link):
   return link.impl.getUnsettled()
 
