@@ -281,6 +281,8 @@ class EventImpl implements Event
     {
         if (context instanceof Transport) {
             return (Transport) context;
+        } else if (context instanceof Connection) {
+        	return ((Connection)context).getTransport();	
         } else {
             return null;
         }
