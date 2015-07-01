@@ -3638,6 +3638,10 @@ class Event(Wrapper, EventBase):
   def _init(self):
     pass
 
+  def copy(self):
+    copy = pn_event_copy(self._impl)
+    return Event.wrap(copy)
+
   @property
   def clazz(self):
     cls = pn_event_class(self._impl)
