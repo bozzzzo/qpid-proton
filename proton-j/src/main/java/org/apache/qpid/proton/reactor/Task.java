@@ -28,5 +28,5 @@ public interface Task extends Extendable {
     public long deadline();
     public void setReactor(Reactor reactor);
     public Reactor getReactor();
-
+    public void cancel();
 }
