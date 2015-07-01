@@ -121,6 +121,7 @@ public class ReactorTest {
 
         @Override
         public void onUnhandled(Event event) {
+            assertNotNull(event.getReactor());
             actual.add(event.getType());
         }
 
