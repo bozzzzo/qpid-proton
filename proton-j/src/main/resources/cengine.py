@@ -1047,6 +1047,22 @@ class pn_event:
   def copy(self):
     return pn_event(self.impl.copy())
 
+  @property
+  def nesting(self):
+      try:
+          return self.impl.nesting
+      except:
+          print "No impl? ", self.impl
+          import traceback
+          traceback.print_exc()
+          raise
+  
+  def dispatchEnter(self):
+      self.impl.dispatchEnter()
+      
+  def dispatchLeave(self):
+      self.impl.dispatchLeave()
+
 def pn_collector_peek(coll):
   ev = coll.peek()
   if ev:

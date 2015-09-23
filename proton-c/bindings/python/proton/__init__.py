@@ -3676,6 +3676,7 @@ class EventBase(object):
     self.type = type
 
   def dispatch(self, handler):
+    print "py-base-dispatch", self.type, " to ", handler
     return dispatch(handler, self.type.method, self)
 
 def _none(x): return None
@@ -3775,15 +3776,28 @@ class Event(Wrapper, EventBase):
     return wrappers[self.clazz](pn_event_context(self._impl))
 
   def dispatch(self, handler, type=None):
+    if type != None:
+        pass
     type = type or self.type
+    try:
+       indent = " " * self._impl.nesting
+    except:
+        indent = "    " + str(self._impl) + " (" + str(vars(self._impl)) + ")" + " ?     "
     if isinstance(handler, WrappedHandler):
+      print indent, "py-dispatch event ", type.number, " to pn_handler_dispatch ", handler
       pn_handler_dispatch(handler._impl, self._impl, type.number)
     else:
-      result = dispatch(handler, type.method, self)
-      if result != DELEGATED and hasattr(handler, "handlers"):
-        for h in handler.handlers:
-          self.dispatch(h, type)
-
+      if hasattr(handler, type.method) or hasattr(handler, "on_unhandled"):
+        print indent, "py-dispatch event ", type.method, " to py ", handler
+      self._impl.dispatchEnter();
+      try:
+        result = dispatch(handler, type.method, self)
+        if result != DELEGATED and hasattr(handler, "handlers"):
+          for h in handler.handlers:
+            print indent, "---- py-delegate event ", type.method," from py ", handler, " to py ", h
+            self.dispatch(h, type)
+      finally:
+        self._impl.dispatchLeave()
 
   @property
   def reactor(self):

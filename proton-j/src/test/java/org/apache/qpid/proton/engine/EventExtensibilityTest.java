@@ -256,6 +256,21 @@ public class EventExtensibilityTest extends TestCase {
         public void delegate() throws HandlerException {
             impl.delegate();
         }
+
+        @Override
+        public int getNesting() {
+            return impl.getNesting();
+        }
+
+        @Override
+        public void dispatchEnter() {
+            impl.dispatchEnter();
+        }
+
+        @Override
+        public void dispatchLeave() {
+            impl.dispatchLeave();
+        }
     }
 
     public class ExtendedTestEventGenerator extends BaseHandler {

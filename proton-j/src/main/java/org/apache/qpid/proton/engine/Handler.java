@@ -52,4 +52,10 @@ public interface Handler
     void add(Handler child);
 
     Iterator<Handler> children();
+
+    /**
+     * Count of unhandled events. Incremented only by {@link BaseHandler#onUnhandled(Event)}
+     * @return Number of events that this handler instance did not handle in any way.
+     */
+    int getUnhandled();
 }

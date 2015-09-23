@@ -173,4 +173,9 @@ public interface Event extends Extendable
 
     Event copy();
 
+    int getNesting();
+
+    void dispatchEnter();
+    void dispatchLeave();
+
 }

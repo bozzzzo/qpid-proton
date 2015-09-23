@@ -49,6 +49,7 @@ public class BaseHandler implements CoreHandler
     }
 
     private LinkedHashSet<Handler> children = new LinkedHashSet<Handler>();
+    private int unhandled;
 
     @Override public void onConnectionInit(Event e) { onUnhandled(e); }
     @Override public void onConnectionLocalOpen(Event e) { onUnhandled(e); }
@@ -97,7 +98,9 @@ public class BaseHandler implements CoreHandler
     @Override public void onSelectableError(Event e) { onUnhandled(e); }
     @Override public void onSelectableFinal(Event e) { onUnhandled(e); }
 
-    @Override public void onUnhandled(Event event) {}
+    @Override public void onUnhandled(Event event) { unhandled++; }
+
+    @Override public int getUnhandled() { return unhandled; }
 
     @Override
     public void add(Handler child) {

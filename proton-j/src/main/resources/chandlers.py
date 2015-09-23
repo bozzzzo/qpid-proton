@@ -42,6 +42,7 @@ class pn_pyhandler(BaseHandler):
     def onUnhandled(self, event):
         ev = pn_event(event)
         try:
+            print (" " * ev.nesting) + "Dispatching onUnhandled from " + repr(self) + " to " + repr(self.pyobj)
             self.pyobj.dispatch(ev, pn_event_type(ev))
         except HandlerException:
             ex = sys.exc_info();

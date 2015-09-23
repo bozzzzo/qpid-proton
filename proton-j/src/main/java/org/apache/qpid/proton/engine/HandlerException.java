@@ -27,13 +27,24 @@ public class HandlerException extends RuntimeException {
     private static final long serialVersionUID = 5300211824119834005L;
 
     private final Handler handler;
+    private final EventType type;
 
-    public HandlerException(Handler handler, Throwable cause) {
+    public HandlerException(EventType type, Handler handler, Throwable cause) {
         super(cause);
         this.handler = handler;
+        this.type = type;
     }
 
     public Handler getHandler() {
         return handler;
+    }
+    
+    public EventType getType() {
+        return type;
+    }
+    
+    @Override
+    public String toString() {
+        return "HandlerException(" + type + ", " + handler.getClass().getName() + " cause= " + getCause();
     }
 }

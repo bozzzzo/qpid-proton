@@ -20,7 +20,10 @@
  */
 package org.apache.qpid.proton.engine.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.qpid.proton.engine.Connection;
 import org.apache.qpid.proton.engine.Delivery;
@@ -46,7 +49,6 @@ import org.apache.qpid.proton.reactor.impl.ReactorImpl;
 
 class EventImpl implements Event
 {
-
     EventType type;
     Object context;
     EventImpl next;
@@ -69,6 +71,7 @@ class EventImpl implements Event
         type = null;
         context = null;
         attachments.clear();
+        nesting = 0;
     }
 
     @Override
@@ -98,22 +101,30 @@ class EventImpl implements Event
 
     private Handler delegated = null;
 
+    private int nesting = 0;
     @Override
     public void dispatch(Handler handler) throws HandlerException
     {
         Handler old_delegated = delegated;
         try {
+            dispatchEnter();
             delegated = handler;
             try {
+                int unhandled = handler.getUnhandled();
                 handler.handle(this);
+                if (unhandled == handler.getUnhandled()) {
+                    System.err.println(indent() + "Dispatched event type " + type + " on context " + context + " to handler " + handler.getClass().getName() + ":" + System.identityHashCode(handler));
+                }
             } catch(HandlerException handlerException) {
                 throw handlerException;
             } catch(RuntimeException runtimeException) {
-                throw new HandlerException(handler, runtimeException);
+                System.err.println(indent() + "Exception dispatching event type " + type + " to handler " + handler.getClass().getName() + ":" + System.identityHashCode(handler));
+                throw new HandlerException(type, handler, runtimeException);
             }
             delegate();
         } finally {
             delegated = old_delegated;
+            dispatchLeave();
         }
     }
 
@@ -124,11 +135,16 @@ class EventImpl implements Event
             return; // short circuit
         }
         Iterator<Handler> children = delegated.children();
+        Handler handler = delegated;
         delegated = null;
         while(children.hasNext()) {
-            dispatch(children.next());
+            Handler child = children.next();
+            System.err.println(indent() + "---- delegate event type " + type + " on context " + context + " from "  + handler.getClass().getName() + ":" + System.identityHashCode(handler) + " to child handler " + child.getClass().getName() + ":" + System.identityHashCode(child));
+            dispatch(child);
         }
     }
+
+    private String indent() { return String.format("%1$-" + nesting + "s", " "); }
 
     @Override
     public void redispatch(EventType as_type, Handler handler) throws HandlerException 
@@ -138,10 +154,15 @@ class EventImpl implements Event
         }
         EventType old = type;
         try {
+            dispatchEnter();
             type = as_type;
-            dispatch(handler);
+            Class<? extends Handler> hc = handler.getClass();
+            String name = hc.getName();
+            System.err.println(indent() + "Redispatching event type " + type + " (was " + old + ") " + " to handler " + name + ":" + System.identityHashCode(handler));
+            dispatch(handler);  
         }
         finally {
+            dispatchLeave();
             type = old;
         }
     }
@@ -304,5 +325,20 @@ class EventImpl implements Event
         return "EventImpl{" + "type=" + type + ", context=" + context + '}';
     }
 
+
+    @Override
+    public int getNesting() {
+        return nesting;
+    }
+    
+    @Override
+    public void dispatchEnter() {
+        nesting++;
+    }
+
+    @Override
+    public void dispatchLeave() {
+        nesting--;
+    }
 
 }
